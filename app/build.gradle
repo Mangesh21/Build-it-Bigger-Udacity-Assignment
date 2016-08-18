@@ -1,0 +1,54 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+
+    defaultConfig {
+        applicationId "com.udacity.gradle.builditbigger"
+        minSdkVersion 15
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    productFlavors {
+        paid {
+            applicationId "com.udacity.gradle.builditbigger.paid"
+            versionName "1.0-paid"
+            resValue "string", "app_name", "Build it Bigger Paid"
+        }
+        free {
+            applicationId "com.udacity.gradle.builditbigger.free"
+            versionName "1.0-free"
+            resValue "string", "app_name", "Build it Bigger Free"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    // Added for AdMob
+    compile project(':androidjokeslibrary')
+
+    compile 'com.google.android.gms:play-services-auth:8.4.0'
+    compile 'com.google.android.gms:play-services-gcm:8.4.0'
+
+    freeCompile 'com.google.android.gms:play-services-ads:8.4.0'
+
+    androidTestCompile 'org.mockito:mockito-core:1.10.19'
+    androidTestCompile('com.android.support.test:runner:0.4.1') {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    }
+    compile project(path: ':jokesbackend', configuration: 'android-endpoints')
+}
