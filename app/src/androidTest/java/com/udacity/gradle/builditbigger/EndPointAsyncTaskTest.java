@@ -1,15 +1,14 @@
 package com.udacity.gradle.builditbigger;
 
+import android.test.AndroidTestCase;
 import android.text.TextUtils;
-
-import junit.framework.TestCase;
 
 import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by mangesh on 16/8/16.
  */
-public class EndPointAsyncTaskTest extends TestCase implements Callback{
+public class EndPointAsyncTaskTest extends AndroidTestCase implements Callback{
 
     String result = null;
     Exception mError = null;
