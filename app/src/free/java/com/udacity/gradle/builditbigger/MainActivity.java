@@ -6,16 +6,35 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.udacity.androidjokeslibrary.JokesActivity;
 
 
 public class MainActivity extends AppCompatActivity implements Callback {
 
+    InterstitialAd mInterstitialAd;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId(getString(R.string.admob_id));
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdClosed() { // AD closed
+                requestNewInterstitial();
+                new EndPointAsyncTask(MainActivity.this).execute();//fetch joke
+            }
+        });
+
+        requestNewInterstitial();
 
     }
 
@@ -43,14 +62,29 @@ public class MainActivity extends AppCompatActivity implements Callback {
     }
 
     public void tellJoke(View view){
-      new EndPointAsyncTask(MainActivity.this).execute();
+        if (mInterstitialAd.isLoaded()) { //add loaded - show
+            mInterstitialAd.show();
+        } else {
+            new EndPointAsyncTask(MainActivity.this).execute();
+        }
+
     }
 
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+        mInterstitialAd.loadAd(adRequest);
+    }
 
     @Override
-    public void onJokeReceived(String joke) {
+    public void onComplete(String result, Exception e) {
+        if(e!=null) {
+            Toast.makeText(MainActivity.this, result, Toast.LENGTH_SHORT).show();//failed to get Joke
+        }else {
             Intent intent = new Intent(this, JokesActivity.class);
-        intent.putExtra(JokesActivity.INTENT_JOKE, joke);
-        startActivity(intent);
+            intent.putExtra(JokesActivity.INTENT_JOKE, result);
+            startActivity(intent);
+        }
     }
 }

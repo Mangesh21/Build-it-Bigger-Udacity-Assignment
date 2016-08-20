@@ -1,33 +1,49 @@
 package com.udacity.gradle.builditbigger;
 
-import android.test.AndroidTestCase;
+import android.app.Application;
+import android.test.ApplicationTestCase;
+import android.text.TextUtils;
 
-import org.junit.Assert;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * Created by mangesh on 16/8/16.
  */
-public class EndPointAsyncTaskTest extends AndroidTestCase implements Callback{
+public class EndPointAsyncTaskTest extends ApplicationTestCase<Application> {
 
+    String result = null;
+    Exception mError = null;
+    CountDownLatch signal = null;
 
-    private EndPointAsyncTask async = null;
-
-    public void setUP() throws Exception{
-        super.setUp();
-    }
-
-    public void tearDown() throws Exception{
-        super.tearDown();
-    }
-
-    public void testFetchJoke() {
-        async = (EndPointAsyncTask) new EndPointAsyncTask(EndPointAsyncTaskTest.this).execute();
-
+    public EndPointAsyncTaskTest(Class<Application> applicationClass) {
+        super(applicationClass);
     }
 
     @Override
-    public void onJokeReceived(String joke) {
-        Assert.assertNotNull(joke);
-        Assert.assertNotEquals("",joke);
+    protected void setUp() throws Exception {
+        signal = new CountDownLatch(1);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        signal.countDown();
+    }
+
+
+    public void testjoke() throws InterruptedException {
+
+        EndPointAsyncTask endPointAsyncTask = (EndPointAsyncTask) new EndPointAsyncTask(new Callback() {
+            @Override
+            public void onComplete(String result, Exception e) {
+                EndPointAsyncTaskTest.this.result = result;
+                mError = e;
+                signal.countDown();;
+            }
+        }).execute();
+        signal.await();
+
+        assertNull(mError);
+        assertFalse(TextUtils.isEmpty(result));
     }
 }
+

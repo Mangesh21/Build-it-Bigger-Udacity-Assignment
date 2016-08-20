@@ -18,13 +18,14 @@ import java.io.IOException;
 public class EndPointAsyncTask extends AsyncTask<Void, Void, String> {
     private static MyApi myApiService = null;
     private Callback mCallback;
+    private Exception exception = null;
 
     public EndPointAsyncTask(Callback callback) {
         this.mCallback = callback;
     }
 
     @Override
-    protected String doInBackground(Void... params ) {
+    protected String doInBackground(Void... params) {
         if (myApiService == null) {  // Only do this once
             MyApi.Builder builder = new MyApi.Builder(AndroidHttp.newCompatibleTransport(),
                     new AndroidJsonFactory(), null)
@@ -44,14 +45,15 @@ public class EndPointAsyncTask extends AsyncTask<Void, Void, String> {
         try {
             return myApiService.getJokes().execute().getJoke();
         } catch (IOException e) {
+            exception = e;
             return e.getMessage();
         }
     }
 
-
-
     @Override
-    protected void onPostExecute(String result) {
-        mCallback.onJokeReceived(result);
+    protected void onPostExecute(String result) { //result can be either joke or error message
+        if (mCallback != null) {
+            mCallback.onComplete(result, exception);
+        }
     }
 }

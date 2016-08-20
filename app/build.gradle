@@ -1,17 +1,17 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
 
     defaultConfig {
         applicationId "com.udacity.gradle.builditbigger"
         minSdkVersion 15
-        targetSdkVersion 23
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.android.test.runner.MultiDexTestRunner"
     }
 
     productFlavors {
@@ -24,6 +24,7 @@ android {
             applicationId "com.udacity.gradle.builditbigger.free"
             versionName "1.0-free"
             resValue "string", "app_name", "Build it Bigger Free"
+            resValue "string", "admob_id", "ca-app-pub-3940256099942544/1033173712"
         }
     }
 
@@ -34,21 +35,20 @@ android {
         }
 
     }
+
+    configurations.all {
+        resolutionStrategy {
+           // force 'com.android.support:support-annotations:23.1.1'
+            force 'com.android.support:support-annotations:24.1.1'
+        }
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    // Added for AdMob
     compile project(':androidjokeslibrary')
-
-    compile 'com.google.android.gms:play-services-auth:8.4.0'
-    compile 'com.google.android.gms:play-services-gcm:8.4.0'
-
+    compile 'com.android.support:multidex:1.0.1'
     freeCompile 'com.google.android.gms:play-services-ads:8.4.0'
-
-    androidTestCompile 'org.mockito:mockito-core:1.10.19'
-    androidTestCompile('com.android.support.test:runner:0.4.1') {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    }
+    testCompile 'junit:junit:4.12'
     compile project(path: ':jokesbackend', configuration: 'android-endpoints')
 }
