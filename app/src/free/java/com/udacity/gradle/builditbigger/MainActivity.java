@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdListener;
@@ -17,6 +18,8 @@ import com.udacity.androidjokeslibrary.JokesActivity;
 public class MainActivity extends AppCompatActivity implements Callback {
 
     InterstitialAd mInterstitialAd;
+
+    private ProgressBar spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +33,14 @@ public class MainActivity extends AppCompatActivity implements Callback {
             @Override
             public void onAdClosed() { // AD closed
                 requestNewInterstitial();
+                spinner.setVisibility(View.VISIBLE);
                 new EndPointAsyncTask(MainActivity.this).execute();//fetch joke
             }
         });
 
         requestNewInterstitial();
+        spinner = (ProgressBar) findViewById(R.id.progressBar1);
+        spinner.setVisibility(View.GONE);
 
     }
 
@@ -65,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements Callback {
         if (mInterstitialAd.isLoaded()) { //add loaded - show
             mInterstitialAd.show();
         } else {
+            spinner.setVisibility(View.VISIBLE);
             new EndPointAsyncTask(MainActivity.this).execute();
         }
 
@@ -79,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements Callback {
 
     @Override
     public void onComplete(String result, Exception e) {
+        spinner.setVisibility(View.GONE);
         if(e!=null) {
             Toast.makeText(MainActivity.this, result, Toast.LENGTH_SHORT).show();//failed to get Joke
         }else {

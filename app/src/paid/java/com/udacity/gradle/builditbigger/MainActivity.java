@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.udacity.androidjokeslibrary.JokesActivity;
@@ -14,11 +15,15 @@ import com.udacity.androidjokeslibrary.JokesActivity;
 public class MainActivity extends AppCompatActivity implements Callback {
 
 
+    private ProgressBar spinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        spinner = (ProgressBar) findViewById(R.id.progressBar1);
+        spinner.setVisibility(View.GONE);
+
 
     }
 
@@ -45,17 +50,18 @@ public class MainActivity extends AppCompatActivity implements Callback {
         return super.onOptionsItemSelected(item);
     }
 
-    public void tellJoke(View view){
-      new EndPointAsyncTask(MainActivity.this).execute();
+    public void tellJoke(View view) {
+        spinner.setVisibility(View.VISIBLE);
+        new EndPointAsyncTask(MainActivity.this).execute();
     }
-
 
 
     @Override
     public void onComplete(String result, Exception e) {
-        if(e!=null) {
+        spinner.setVisibility(View.GONE);
+        if (e != null) {
             Toast.makeText(MainActivity.this, result, Toast.LENGTH_SHORT).show();//failed to get Joke
-        }else {
+        } else {
             Intent intent = new Intent(this, JokesActivity.class);
             intent.putExtra(JokesActivity.INTENT_JOKE, result);
             startActivity(intent);
