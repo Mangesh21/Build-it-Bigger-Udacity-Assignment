@@ -17,3 +17,39 @@ allprojects {
         jcenter()
     }
 }
+
+task startGAE(dependsOn: ":jokesbackend:appengineRun") {
+    evaluationDependsOn ":jokesbackend"
+
+    project(":jokesbackend") {
+        appengine {
+            daemon true
+            httpPort = 8081
+        }
+    }
+
+    doLast {
+        println "GAE has been started."
+    }
+}
+
+task stopGAE(dependsOn: ":jokesbackend:appengineStop") {
+    doLast {
+        println "GAE has been stopped."
+    }
+}
+
+task runTests(dependsOn: ":app:connectedAndroidTest") {
+    doLast {
+        println "Tests have been completed."
+    }
+}
+
+task checkAllTests(dependsOn: ["startGAE", "runTests", "stopGAE"]) {
+    doLast {
+        println "All tests have been checked."
+    }
+}
+
+runTests.mustRunAfter "startGAE"
+runTests.finalizedBy "stopGAE"
